@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { gsap, prefersReducedMotion } from '@/lib/kit/gsap'
 import type { Film } from '@/data/films'
+import LazyVideo from '@/components/kit/LazyVideo'
 
 /**
  * The hero: a looping column of greyscale thumbnails under four corner marks.
@@ -9,8 +10,8 @@ import type { Film } from '@/data/films'
  * on the centre line.
  *
  * Reworked from creative-kit's ViewfinderStrip: thin corner marks that follow
- * the framed clip instead of the fixed lens, a turning list on both sides, the
- * framed clip plays, and the wheel only drives the strip near the centre column
+ * the framed clip instead of the fixed lens, a turning list on both sides, every
+ * thumbnail is a playing clip, and the wheel only drives the strip near the centre column
  * so the page still scrolls from the sides.
  */
 
@@ -298,7 +299,8 @@ export default function FilmStrip({ films, onActive, onOpen, select, size = 0.15
               aspects.current[j % N] = img.naturalWidth / img.naturalHeight
             }}
           />
-          {j === framed && film.video && <video src={film.video} poster={film.src} autoPlay muted loop playsInline preload="auto" className="absolute inset-0 h-full w-full object-cover" />}
+          {/* Every thumbnail plays (greyscale until framed); off-screen ones pause */}
+          {film.video && <LazyVideo src={film.video} poster={film.src} className="absolute inset-0 h-full w-full object-cover" />}
         </button>
       ))}
 
