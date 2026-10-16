@@ -1,0 +1,74 @@
+/*
+ * creative-kit base layer. Import after Tailwind and your theme:
+ *   @import "tailwindcss";
+ *   @import "./theme.css";
+ *   @import "./kit.css";
+ */
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+}
+
+::selection {
+  background: var(--color-accent);
+  color: var(--color-ink);
+}
+
+/* Small uppercase label used across blocks */
+.caption {
+  font-family: var(--font-mono, var(--font-sans));
+  font-size: 12px;
+  line-height: 1.2;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.caption button {
+  text-transform: inherit;
+}
+
+/* Lenis smooth scroll */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* iOS Safari: keep border-radius clipping on media */
+[data-media] {
+  transform: translateZ(0);
+}
+
+/* MeltText lines */
+.kit-melt-line {
+  display: block;
+}
+
+@keyframes kit-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* PixelCursor hides the system cursor on precise pointers */
+@media (pointer: fine) and (hover: hover) {
+  html.kit-cursor-none,
+  html.kit-cursor-none * {
+    cursor: none !important;
+  }
+}
