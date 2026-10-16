@@ -300,7 +300,7 @@ export default function FilmStrip({ films, onActive, onOpen, select, size = 0.15
             }}
           />
           {/* Every thumbnail plays (greyscale until framed); off-screen ones pause */}
-          {film.video && <LazyVideo src={film.video} poster={film.src} className="absolute inset-0 h-full w-full object-cover" />}
+          <LazyVideo src={film.video} poster={film.src} className="absolute inset-0 h-full w-full object-cover" />
         </button>
       ))}
 

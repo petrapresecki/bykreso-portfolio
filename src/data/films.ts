@@ -9,18 +9,18 @@ export interface Film {
   line: string
   /** Poster image; any aspect ratio */
   src: string
-  /** Clip that plays in the framed slot and the player */
-  video?: string
+  /** Clip that plays in the strip and the player */
+  video: string
   /** The whole film as one strip, one column per frame (public/barcodes, made by scripts/barcode.swift) */
   barcode: string
   /** The film's colour: the page turns this colour while it's framed */
   color: string
 }
 
-const film = (f: Omit<Film, 'src' | 'video' | 'barcode'> & { still?: boolean }): Film => ({
+const film = (f: Omit<Film, 'src' | 'video' | 'barcode'>): Film => ({
   ...f,
   src: `/media/${f.id}.jpg`,
-  video: f.still ? undefined : `/media/${f.id}.mp4`,
+  video: `/media/${f.id}.mp4`,
   barcode: `/barcodes/${f.id}.png`,
 })
 
@@ -35,6 +35,5 @@ export const films: Film[] = [
   film({ id: 'love-in-adhd-finale', title: 'Love in ADHD: The Finale', category: 'Vjenčanje', place: 'Zagreb', year: 2025, line: 'The last dance.', color: '#9C7E6B' }),
   film({ id: 'southern-comfort', title: 'Southern Comfort', category: 'Grad', place: 'Split', year: 2025, line: 'Split, in the heat.', color: '#9A7A68' }), // old site
   film({ id: 'analogija', title: 'Analogija liberalnog uma', category: 'Grad', place: 'Zagreb', year: 2025, line: 'An analogy of a liberal mind.', color: '#BF9563' }), // old site
-  film({ id: 'freud', title: 'Freud has left the chat', category: 'Kratki film', place: 'Somewhere flat', year: 2025, line: 'Somewhere flat, facing the sea.', color: '#DBBE92', still: true }), // old site
   film({ id: 'pravda', title: 'Pravda za Martićevu', category: 'Grad', place: 'Martićeva, Zagreb', year: 2025, line: 'Justice for Martićeva street.', color: '#A86248' }), // old site
 ]

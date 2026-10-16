@@ -73,21 +73,17 @@ export default function Player({ films, index, from, onIndex, onClose }: PlayerP
       <div className="absolute inset-0 flex items-center justify-center">
         <div ref={frame} className="relative" style={style}>
           <div key={film.id} className="absolute inset-0 overflow-hidden bg-ink/10 [animation:fade_.5s_ease-out]">
-            {film.video ? (
-              <video
-                src={film.video}
-                poster={film.src}
-                autoPlay
-                loop
-                playsInline
-                muted={!sound}
-                onLoadedMetadata={e => setAspect(e.currentTarget.videoWidth / e.currentTarget.videoHeight)}
-                onClick={close}
-                className="h-full w-full cursor-pointer object-cover"
-              />
-            ) : (
-              <img src={film.src} alt={film.title} onLoad={e => setAspect(e.currentTarget.naturalWidth / e.currentTarget.naturalHeight)} onClick={close} className="h-full w-full cursor-pointer object-cover" />
-            )}
+            <video
+              src={film.video}
+              poster={film.src}
+              autoPlay
+              loop
+              playsInline
+              muted={!sound}
+              onLoadedMetadata={e => setAspect(e.currentTarget.videoWidth / e.currentTarget.videoHeight)}
+              onClick={close}
+              className="h-full w-full cursor-pointer object-cover"
+            />
           </div>
           <span className={`${corner} -top-2 -left-2 border-t-[1.5px] border-l-[1.5px]`} />
           <span className={`${corner} -top-2 -right-2 border-t-[1.5px] border-r-[1.5px]`} />
@@ -100,11 +96,9 @@ export default function Player({ films, index, from, onIndex, onClose }: PlayerP
         {film.title}
       </p>
       <div data-chrome className="absolute top-3 right-3 flex gap-4">
-        {film.video && (
-          <button type="button" onClick={() => setSound(s => !s)} className="cursor-pointer">
-            Zvuk: <span className={sound ? '' : 'opacity-60'}>{sound ? 'on' : 'off'}</span>
-          </button>
-        )}
+        <button type="button" onClick={() => setSound(s => !s)} className="cursor-pointer">
+          Zvuk: <span className={sound ? '' : 'opacity-60'}>{sound ? 'on' : 'off'}</span>
+        </button>
         <button type="button" onClick={close} className="cursor-pointer">
           Zatvori ×
         </button>

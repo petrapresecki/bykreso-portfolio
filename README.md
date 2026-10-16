@@ -23,5 +23,3 @@ Clips and covers are in `public/media/<id>.mp4|jpg` and come from [@bykreso](htt
 swiftc -O -o /tmp/barcode scripts/barcode.swift
 /tmp/barcode public/media/<id>.mp4 public/barcodes/<id>.png 240
 ```
-
-`freud` has no clip, so it shows its cover and its barcode comes from that image.
