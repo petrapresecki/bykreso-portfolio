@@ -43,7 +43,7 @@ export default function Work({ films, onOpen }: { films: Film[]; onOpen: (index:
               onClick={e => onOpen(i, e.currentTarget.getBoundingClientRect())}
               className="group relative block h-[clamp(22px,5.2vh,46px)] w-full cursor-pointer overflow-hidden"
             >
-              <img src={film.barcode} alt="" draggable={false} className="absolute inset-0 h-full w-full object-fill blur-[0.6px] saturate-[0.85] transition-[filter] duration-500 group-hover:saturate-125" />
+              <img src={film.barcode} alt="" draggable={false} className="absolute inset-0 h-full w-full object-fill [image-rendering:pixelated] saturate-[0.85] transition-[filter] duration-500 group-hover:saturate-125" />
               <span className="absolute inset-0 opacity-0 transition-opacity duration-500 ease-out group-hover:opacity-100" style={{ backgroundColor: film.color }} />
               <span className="absolute inset-y-0 left-0 w-px bg-ink/0 transition-colors group-hover:bg-ink/40" />
               <span

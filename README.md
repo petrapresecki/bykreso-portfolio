@@ -21,5 +21,5 @@ Clips and covers are in `public/media/<id>.mp4|jpg` and come from [@bykreso](htt
 
 ```sh
 swiftc -O -o /tmp/barcode scripts/barcode.swift
-/tmp/barcode public/media/<id>.mp4 public/barcodes/<id>.png 240
+/tmp/barcode public/media/<id>.mp4 public/barcodes/<id>.png 600
 ```
