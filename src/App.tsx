@@ -101,8 +101,8 @@ export default function App() {
           className="min-h-[70svh] pt-24 pb-40"
           left={
             <div data-rise>
-              <a href="mailto:hello@bykreso.com" className="underline-offset-2 hover:underline">
-                hello@bykreso.com
+              <a href="mailto:bykreso@gmail.com" className="underline-offset-2 hover:underline">
+                bykreso@gmail.com
               </a>
               <p className="mt-2 text-ink/50">Ženiš se? Otvaraš bar? Imaš bend?</p>
             </div>

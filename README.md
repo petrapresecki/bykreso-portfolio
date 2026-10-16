@@ -24,4 +24,4 @@ swiftc -O -o /tmp/barcode scripts/barcode.swift
 /tmp/barcode public/media/<id>.mp4 public/barcodes/<id>.png 240
 ```
 
-`freud.mp4` is VP9, which AVFoundation can't read, so its barcode comes from the cover. `dos-luka` uses a wedding photo because there is no clip of it yet.
+`freud` has no clip, so it shows its cover and its barcode comes from that image.
