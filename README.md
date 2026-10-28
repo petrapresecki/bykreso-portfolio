@@ -1,5 +1,9 @@
 # bykreso
 
+![The film strip: the page takes the colour of whichever film is framed](docs/preview.gif)
+
+Live at [bykreso.pages.dev](https://bykreso.pages.dev/).
+
 Portfolio for Krešo, who films and grades weddings, bands, bars and cities in Zagreb. Rebuilt from a screen recording of the original after it was lost.
 
 ```sh
