@@ -20,7 +20,7 @@ export default function Spine({ id, label, left, right, className = '' }: { id: 
   )
 
   return (
-    <section ref={root} id={id} className={`relative flex flex-col items-center px-3 ${className}`}>
+    <section ref={root} id={id} tabIndex={-1} className={`relative flex flex-col items-center px-3 outline-none ${className}`}>
       <span data-rule className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-ink/30" />
       <h2 data-rise className="mono relative z-10 mb-6 bg-paper py-2">
         {label}

@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { initLenis, destroyLenis, getLenis } from '@/lib/kit/lenis'
+import { prefersReducedMotion } from '@/lib/kit/gsap'
+import { setCovered } from '@/lib/covered'
 import { initPaint, paint, usePageColor } from '@/lib/page-color'
 import { films, type Film } from '@/data/films'
 import FilmStrip from '@/components/FilmStrip'
@@ -22,10 +24,16 @@ export default function App() {
   const [framed, setFramed] = useState(0)
   const [select, setSelect] = useState<{ index: number }>()
 
+  // Smooth scroll only for those who haven't asked for less motion
   useEffect(() => {
+    if (prefersReducedMotion()) return
     initLenis()
     return () => destroyLenis()
   }, [])
+
+  // Under the player the page stops: the strip stops turning, its clips pause
+  const covered = player !== null
+  useEffect(() => setCovered(covered), [covered])
 
   // Which section the nav marks: the one crossing the middle of the screen
   useEffect(() => {
@@ -47,25 +55,35 @@ export default function App() {
     paint(film.color)
   }, [])
 
-  const go = (id: string) => getLenis()?.scrollTo(id === 'top' ? 0 : `#${id}`, { duration: 1.6 })
+  // Scroll to a section, then hand it keyboard focus so Tab carries on from there
+  const go = (id: string) => {
+    const el = document.getElementById(id)!
+    const land = () => el.focus({ preventScroll: true })
+    const lenis = getLenis()
+    if (lenis) lenis.scrollTo(id === 'top' ? 0 : el, { duration: 1.6, onComplete: land })
+    else {
+      el.scrollIntoView()
+      land()
+    }
+  }
 
   return (
     <>
-      <header className="fixed inset-x-0 top-0 z-40 flex justify-between px-3 py-3">
+      <header inert={covered} className="fixed inset-x-0 top-0 z-40 flex justify-between px-3 py-3">
         <button type="button" onClick={() => go('top')} className="mono cursor-pointer text-[11px]">
           bykreso
         </button>
         <nav className="flex gap-4">
           {sections.map(s => (
-            <button key={s.id} type="button" onClick={() => go(s.id)} className={`mono cursor-pointer text-[10px] transition-opacity duration-300 ${current === s.id ? 'opacity-100' : 'opacity-50 hover:opacity-100'}`}>
+            <button key={s.id} type="button" onClick={() => go(s.id)} aria-current={current === s.id ? 'true' : undefined} className={`mono cursor-pointer text-[10px] transition-opacity duration-300 ${current === s.id ? 'opacity-100' : 'opacity-50 hover:opacity-100'}`}>
               {s.label}
             </button>
           ))}
         </nav>
       </header>
 
-      <main className="bg-paper text-ink">
-        <section id="top" className="relative h-svh">
+      <main inert={covered} className="bg-paper text-ink">
+        <section id="top" tabIndex={-1} className="relative h-svh outline-none">
           <FilmStrip films={films} select={select} onActive={onActive} onOpen={(index, from) => setPlayer({ index, from })} className="h-full" />
           <p className="mono pointer-events-none absolute bottom-3 left-3 z-30">Krešo — snima i gradira, Zagreb</p>
           <p className="mono pointer-events-none absolute right-3 bottom-3 z-30 tabular-nums">{hex}</p>

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { gsap, prefersReducedMotion } from '@/lib/kit/gsap'
 import type { Film } from '@/data/films'
 import LazyVideo from '@/components/kit/LazyVideo'
+import { isCovered } from '@/lib/covered'
 
 /**
  * The hero: a looping column of greyscale thumbnails under four corner marks.
@@ -53,10 +54,16 @@ export default function FilmStrip({ films, onActive, onOpen, select, size = 0.15
   const metas = useRef<(HTMLLIElement | null)[]>([])
   const corners = useRef<HTMLDivElement>(null)
   const lists = useRef<HTMLDivElement>(null)
-  const aspects = useRef<number[]>([])
+  // Known from the data, so the first layout is already right; the posters refine it when they load
+  const aspects = useRef<number[]>(films.map(f => (f.wide ? 16 / 9 : 9 / 16)))
   const [height, setHeight] = useState(800)
   const [framed, setFramed] = useState(0)
   const reduced = useMemo(() => prefersReducedMotion(), [])
+  // The page keeps the first film's colour until the strip has risen in, instead of flashing through every film it passes
+  const [arrived, setArrived] = useState(reduced)
+  // Which tiles are on the strip ('1') or parked out of sight ('0'): only those on it play
+  const [shown, setShown] = useState('')
+  const inView = useRef(true)
   const motion = useRef({ scroll: 0, target: 0, lastInput: 0, dragging: false, dragY: 0, moved: 0, open: 1, started: false, centres: [] as number[], length: 1, box: { w: 0, h: 0 } })
 
   const copies = Math.max(1, Math.ceil((2.4 * height) / Math.max(1, N * (height * size * 1.1 + GAP))))
@@ -71,8 +78,15 @@ export default function FilmStrip({ films, onActive, onOpen, select, size = 0.15
   }, [])
 
   useEffect(() => {
-    onActive?.(films[active], active)
-  }, [active, films, onActive])
+    if (arrived) onActive?.(films[active], active)
+  }, [active, films, onActive, arrived])
+
+  // Nothing to turn while the strip is scrolled away or under the player
+  useEffect(() => {
+    const io = new IntersectionObserver(([e]) => (inView.current = e.isIntersecting))
+    io.observe(root.current!)
+    return () => io.disconnect()
+  }, [])
 
   const offsetTo = (k: number) => {
     const m = motion.current
@@ -110,8 +124,10 @@ export default function FilmStrip({ films, onActive, onOpen, select, size = 0.15
     const m = motion.current
     const el = root.current!
     let current = -1
+    let lastShown = ''
 
     const tick = (_t: number, deltaMs: number) => {
+      if (m.started && (!inView.current || isCovered())) return
       const dt = Math.min(deltaMs / 1000, 1 / 30)
       const H = el.clientHeight
       const base = H * size
@@ -130,7 +146,7 @@ export default function FilmStrip({ films, onActive, onOpen, select, size = 0.15
           // Rise in from below while the corner marks open out of the centre
           m.scroll -= H * 1.1
           m.open = 0
-          gsap.to(m, { open: 1, duration: 1.4, delay: 0.4, ease: 'expo.inOut' })
+          gsap.to(m, { open: 1, duration: 1.4, delay: 0.4, ease: 'expo.inOut', onComplete: () => setArrived(true) })
         }
       }
 
@@ -154,6 +170,7 @@ export default function FilmStrip({ films, onActive, onOpen, select, size = 0.15
       let boxW = 0
       let boxH = 0
       let weight = 0
+      let onStrip = ''
       tiles.current.forEach((tile, j) => {
         if (!tile) return
         let y = ys[j]
@@ -167,6 +184,7 @@ export default function FilmStrip({ films, onActive, onOpen, select, size = 0.15
           weight += f
         }
         const visible = Math.abs(y) < H / 2 + h * zoom
+        onStrip += visible ? '1' : '0'
         tile.style.visibility = visible ? 'visible' : 'hidden'
         if (!visible) return
         tile.style.height = `${h}px`
@@ -175,6 +193,10 @@ export default function FilmStrip({ films, onActive, onOpen, select, size = 0.15
         tile.style.filter = f > 0.99 ? 'none' : `grayscale(${1 - f}) contrast(${0.85 + 0.15 * f}) brightness(${0.92 + 0.08 * f})`
         tile.style.zIndex = f > 0.5 ? '2' : '1'
       })
+      if (onStrip !== lastShown) {
+        lastShown = onStrip
+        setShown(onStrip)
+      }
       if (weight > 0) {
         const tw = boxW / weight + PAD * 2
         const th = boxH / weight + PAD * 2
@@ -252,7 +274,8 @@ export default function FilmStrip({ films, onActive, onOpen, select, size = 0.15
     }
   }, [])
 
-  const corner = 'absolute size-3 border-ink'
+  // Keyboard focus on the strip: the viewfinder's marks grow and thicken
+  const corner = 'absolute size-3 border-ink transition-[width,height] duration-300 group-focus-visible:size-5'
 
   return (
     <div
@@ -260,7 +283,7 @@ export default function FilmStrip({ films, onActive, onOpen, select, size = 0.15
       tabIndex={0}
       role="region"
       aria-roledescription="carousel"
-      aria-label={`${films[active]?.title ?? ''}, ${active + 1} / ${N}`}
+      aria-label="Filmovi. Strelice mijenjaju film, Enter ga otvara."
       onKeyDown={e => {
         if (document.querySelector('[role=dialog]')) return
         if (e.key === 'ArrowDown' || e.key === 'ArrowRight') step(1)
@@ -269,7 +292,7 @@ export default function FilmStrip({ films, onActive, onOpen, select, size = 0.15
         else return
         e.preventDefault()
       }}
-      className={`relative touch-pan-y overflow-clip outline-none select-none ${className}`}
+      className={`group relative touch-pan-y overflow-clip outline-none select-none ${className}`}
     >
       {loop.map((film, j) => (
         <button
@@ -290,26 +313,28 @@ export default function FilmStrip({ films, onActive, onOpen, select, size = 0.15
           style={{ visibility: 'hidden' }}
         >
           <img
-            src={film.src}
+            src={film.thumb}
             alt=""
             draggable={false}
             className="h-full w-full object-cover"
             onLoad={e => {
               const img = e.currentTarget
               aspects.current[j % N] = img.naturalWidth / img.naturalHeight
+              // If a poster changed the layout, settle back onto the nearest film
+              if (!motion.current.dragging) motion.current.lastInput = performance.now() - 1000
             }}
           />
-          {/* Every thumbnail plays (greyscale until framed); off-screen ones pause */}
-          <LazyVideo src={film.video} poster={film.src} className="absolute inset-0 h-full w-full object-cover" />
+          {/* Every thumbnail on the strip plays a light loop (greyscale until framed); tiles parked off it pause */}
+          <LazyVideo src={film.preview} poster={film.thumb} active={shown[j] === '1'} className="absolute inset-0 h-full w-full object-cover" />
         </button>
       ))}
 
       {/* Corner marks */}
       <div ref={corners} className="pointer-events-none absolute top-1/2 left-1/2 z-10 -translate-x-1/2 -translate-y-1/2">
-        <span className={`${corner} top-0 left-0 border-t-[1.5px] border-l-[1.5px]`} />
-        <span className={`${corner} top-0 right-0 border-t-[1.5px] border-r-[1.5px]`} />
-        <span className={`${corner} bottom-0 left-0 border-b-[1.5px] border-l-[1.5px]`} />
-        <span className={`${corner} right-0 bottom-0 border-r-[1.5px] border-b-[1.5px]`} />
+        <span className={`${corner} top-0 left-0 border-t-[1.5px] border-l-[1.5px] group-focus-visible:border-t-[3px] group-focus-visible:border-l-[3px]`} />
+        <span className={`${corner} top-0 right-0 border-t-[1.5px] border-r-[1.5px] group-focus-visible:border-t-[3px] group-focus-visible:border-r-[3px]`} />
+        <span className={`${corner} bottom-0 left-0 border-b-[1.5px] border-l-[1.5px] group-focus-visible:border-b-[3px] group-focus-visible:border-l-[3px]`} />
+        <span className={`${corner} right-0 bottom-0 border-r-[1.5px] border-b-[1.5px] group-focus-visible:border-r-[3px] group-focus-visible:border-b-[3px]`} />
       </div>
 
       {/* Turning lists: titles on the left, category · place · year on the right */}
@@ -348,6 +373,11 @@ export default function FilmStrip({ films, onActive, onOpen, select, size = 0.15
           ))}
         </ul>
       </div>
+
+      {/* For screen readers: which film is framed now */}
+      <p className="sr-only" aria-live="polite">
+        {films[active] && `${films[active].title}, ${filmMeta(films[active])}`}
+      </p>
 
       {/* Small screens: the framed title under the strip */}
       <p className="pointer-events-none absolute inset-x-0 bottom-14 z-20 px-4 text-center md:hidden">

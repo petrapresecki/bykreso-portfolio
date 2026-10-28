@@ -16,18 +16,23 @@ const lum = (hex: string) => {
 /** Ink flips to cream on darker films so text keeps its contrast */
 export const inkFor = (hex: string) => (lum(hex) > 0.3 ? '#1a1612' : '#f4ede4')
 
+/** On phones the browser's own bar takes the film's colour too */
+const tintBrowser = (hex: string) => document.querySelector('meta[name="theme-color"]')?.setAttribute('content', hex)
+
 export function paint(hex: string, duration = 0.9) {
   if (hex === current) return
   current = hex
   listeners.forEach(l => l())
   const root = document.documentElement
   gsap.to(root, { '--page': hex, '--ink': inkFor(hex), duration, ease: 'power2.out', overwrite: true })
+  tintBrowser(hex)
 }
 
 export function initPaint(hex: string) {
   current = hex
   document.documentElement.style.setProperty('--page', hex)
   document.documentElement.style.setProperty('--ink', inkFor(hex))
+  tintBrowser(hex)
 }
 
 export const usePageColor = () =>

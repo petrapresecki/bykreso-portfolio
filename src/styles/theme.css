@@ -1,8 +1,9 @@
 /* bykreso: the page takes the colour of whichever film is framed (src/lib/page-color.ts sets --page and --ink) */
+/* The first film's colour, so the page is already right before any script runs */
 @property --page {
   syntax: '<color>';
   inherits: true;
-  initial-value: #bf9563;
+  initial-value: #b39a8c;
 }
 @property --ink {
   syntax: '<color>';

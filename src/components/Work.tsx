@@ -29,7 +29,7 @@ export default function Work({ films, onOpen }: { films: Film[]; onOpen: (index:
   )
 
   return (
-    <section ref={root} id="rad" className="relative pt-16 pb-28">
+    <section ref={root} id="rad" tabIndex={-1} className="relative pt-16 pb-28 outline-none">
       <div className="mb-6 grid grid-cols-2 gap-x-6">
         <h2 className="mono text-right">Rad</h2>
         <p className="mono max-w-[30ch] text-ink/60">{films.length} filmova · Svaka traka je cijeli film, kadar po kadar</p>

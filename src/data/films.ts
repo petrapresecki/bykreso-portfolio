@@ -9,24 +9,32 @@ export interface Film {
   line: string
   /** Poster image; any aspect ratio */
   src: string
-  /** Clip that plays in the strip and the player */
+  /** The full clip, for the player */
   video: string
+  /** A light, silent 10 s loop of the clip for the strip (public/media/preview, made by scripts/preview.swift) */
+  preview: string
+  /** The poster at 480px, for the strip */
+  thumb: string
   /** The whole film as one strip, one column per frame (public/barcodes, made by scripts/barcode.swift) */
   barcode: string
   /** The film's colour: the page turns this colour while it's framed */
   color: string
+  /** Landscape poster (the rest are 9:16), so the strip lays out right before any image arrives */
+  wide?: boolean
 }
 
-const film = (f: Omit<Film, 'src' | 'video' | 'barcode'>): Film => ({
+const film = (f: Omit<Film, 'src' | 'video' | 'preview' | 'thumb' | 'barcode'>): Film => ({
   ...f,
   src: `/media/${f.id}.jpg`,
   video: `/media/${f.id}.mp4`,
+  preview: `/media/preview/${f.id}.mp4`,
+  thumb: `/media/thumb/${f.id}.jpg`,
   barcode: `/barcodes/${f.id}.png`,
 })
 
 // Colours marked "old site" were read off the screen recording of the original; the rest are picked to sit with them
 export const films: Film[] = [
-  film({ id: 'love-in-adhd', title: 'Love in ADHD', category: 'Vjenčanje', place: 'Gornji Grad, Zagreb', year: 2025, line: 'A wedding that never sat still.', color: '#B39A8C' }),
+  film({ id: 'love-in-adhd', title: 'Love in ADHD', category: 'Vjenčanje', place: 'Gornji Grad, Zagreb', year: 2025, line: 'A wedding that never sat still.', color: '#B39A8C', wide: true }),
   film({ id: 'jam-the-tram', title: 'Jam the Tram', category: 'Event', place: 'Tram 13, Zagreb', year: 2024, line: 'A party on the number 13.', color: '#8A7A70' }),
   film({ id: 'dea-luka', title: 'Dea & Luka', category: 'Vjenčanje', place: 'Zagreb', year: 2025, line: 'May Day shenanigans.', color: '#968774' }), // old site
   film({ id: 'ki-klop-soma', title: 'Ki Klop × SOMA', category: 'Glazba', place: 'SOMA, Zagreb', year: 2025, line: 'A short lecture at SOMA University.', color: '#8C7F86' }),

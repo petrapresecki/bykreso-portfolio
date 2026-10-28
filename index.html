@@ -5,9 +5,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Krešo — snima i gradira, Zagreb</title>
     <meta name="description" content="Krešo snima i sam gradira vjenčanja, bendove, barove i gradove." />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" />
+    <!-- follows the framed film (src/lib/page-color.ts) -->
+    <meta name="theme-color" content="#b39a8c" />
+    <!-- the link preview when the site is shared: the strip, rendered from the site itself -->
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="hr_HR" />
+    <meta property="og:url" content="https://bykreso.com/" />
+    <meta property="og:title" content="Krešo — snima i gradira, Zagreb" />
+    <meta property="og:description" content="Krešo snima i sam gradira vjenčanja, bendove, barove i gradove." />
+    <meta property="og:image" content="https://bykreso.com/og.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Krešini filmovi u stupcu, jedan uokviren i u boji, a cijela stranica u njegovoj boji" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/inter-latin.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/jetbrains-mono-latin.woff2" crossorigin />
+    <link rel="preload" as="image" href="/media/thumb/love-in-adhd.jpg" fetchpriority="high" />
+    <style>
+      /* Before the script arrives: the first film's colour with the strapline and its hex, where App.tsx puts them */
+      body {
+        margin: 0;
+        background: #b39a8c;
+      }
+      #root:empty::before,
+      #root:empty::after {
+        position: fixed;
+        bottom: 12px;
+        font: 10px/1.3 'JetBrains Mono', ui-monospace, Menlo, monospace;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #1a1612;
+      }
+      #root:empty::before {
+        content: 'Krešo — snima i gradira, Zagreb';
+        left: 12px;
+      }
+      #root:empty::after {
+        content: '#B39A8C';
+        right: 12px;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>

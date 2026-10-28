@@ -1,8 +1,17 @@
 @import "tailwindcss";
+@import "./styles/fonts.css";
 @import "./styles/theme.css";
 @import "./styles/kit.css";
 
 body {
   font-size: 11px;
   line-height: 1.35;
+}
+
+/* Keyboard focus: a hairline in the page's ink, like the strip's marks. In the base layer, so a component's own focus style wins */
+@layer base {
+  :focus-visible {
+    outline: 1.5px solid var(--ink);
+    outline-offset: 3px;
+  }
 }
